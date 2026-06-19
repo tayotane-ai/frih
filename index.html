@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Frih — Made to Move with you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --card:#ededeb;
+    --ink:#111110;
+    --soft:#8d8a85;
+    --hair:#e4e2de;
+    --pill:#141312;
+    --radius:20px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:"Inter",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+
+  /* nav */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:26px 0 18px}
+  .brand{font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:700;font-size:19px;letter-spacing:-.01em;display:flex;align-items:center;gap:6px}
+  .brand .mk{font-size:13px;color:var(--soft)}
+  .menu{display:flex;gap:30px;font-size:14.5px;color:#3a3833;font-weight:500}
+  .menu a{position:relative;padding:3px 0}
+  .menu a::after{content:"";position:absolute;left:0;bottom:0;height:1.5px;width:100%;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+  .menu a:hover::after{transform:scaleX(1)}
+  .start{background:var(--pill);color:#fff;font-weight:600;font-size:13.5px;padding:10px 18px;border-radius:30px;transition:transform .3s var(--ease)}
+  .start:hover{transform:translateY(-1px)}
+
+  /* hero */
+  .hero{text-align:center;padding:clamp(40px,9vh,96px) 0 clamp(30px,5vh,52px)}
+  .hero h1{
+    font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:600;
+    font-size:clamp(42px,8.2vw,104px);line-height:.94;letter-spacing:-.035em;
+  }
+  .hero h1 em{font-style:italic;font-weight:400}
+  .hero p{margin-top:20px;color:var(--soft);font-size:15px;max-width:430px;margin-left:auto;margin-right:auto;line-height:1.5}
+
+  /* filter tabs */
+  .tabs{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--hair);border-radius:12px;overflow:hidden;margin-bottom:14px}
+  .tab{padding:13px 18px;font-size:13.5px;font-weight:500;color:#56534e;border-left:1px solid var(--hair);cursor:pointer;background:none;font-family:inherit;text-align:left;transition:background .25s var(--ease),color .25s}
+  .tab:first-child{border-left:none}
+  .tab[aria-selected="true"]{background:var(--ink);color:#fff}
+  .tab:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+
+  /* cards */
+  .grid{display:flex;flex-direction:column;gap:14px;padding-bottom:70px}
+  .card{
+    position:relative;background:var(--card);border-radius:var(--radius);
+    aspect-ratio:16/10;overflow:hidden;
+    transition:opacity .5s var(--ease),transform .5s var(--ease);
+  }
+  .card.hide{display:none}
+  .card.enter{opacity:0;transform:translateY(16px)}
+
+  .photo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .photo img{max-height:84%;max-width:64%;object-fit:contain;
+    transition:transform .6s var(--ease);will-change:transform}
+  .card:hover .photo img{transform:scale(1.035)}
+
+  /* placeholder shown until the real photo is embedded */
+  .ph{display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--soft)}
+  .ph .sw{width:54px;height:54px;border-radius:50%;border:1px dashed rgba(0,0,0,.18)}
+  .ph .nm{font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:600;font-size:16px;color:#4a4843}
+  .ph .hint{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase}
+
+  .corner-tl{position:absolute;top:16px;left:18px;font-size:12.5px;color:#4a4843;font-weight:500;letter-spacing:.02em}
+  .corner-tr{position:absolute;top:16px;right:18px;font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:700;font-size:13px;letter-spacing:.04em;color:#4a4843;display:flex;align-items:center;gap:6px}
+  .corner-tr .s{font-size:11px}
+
+  .wordmark{position:absolute;right:30px;bottom:28px;font-family:"Bricolage Grotesque","Inter",sans-serif;
+    font-weight:700;font-size:clamp(30px,4.6vw,56px);letter-spacing:-.03em;line-height:.8;color:var(--ink);pointer-events:none;max-width:60%;text-align:right}
+
+  .info{position:absolute;left:18px;bottom:18px;background:#fff;border-radius:14px;
+    padding:16px 16px 14px;width:min(320px,68%);box-shadow:0 8px 30px rgba(0,0,0,.06)}
+  .info .yr{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--soft);font-weight:500;margin-bottom:9px}
+  .info .yr .d{width:14px;height:14px;border-radius:50%;background:var(--ink)}
+  .info .desc{font-size:13px;line-height:1.45;color:#2c2a27}
+  .info .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .info .tags span{font-size:11px;color:#56534e;border:1px solid var(--hair);border-radius:20px;padding:4px 10px}
+  .info .get{margin-top:13px;display:inline-flex;align-items:center;gap:8px;
+    background:var(--pill);color:#fff;font-weight:600;font-size:13px;padding:9px 15px;border-radius:24px;
+    font-family:"Bricolage Grotesque","Inter",sans-serif;transition:gap .3s var(--ease),transform .3s var(--ease)}
+  .info .get:hover{gap:13px;transform:translateY(-1px)}
+
+  .round{position:absolute;right:16px;bottom:16px;width:34px;height:34px;border-radius:50%;
+    background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;
+    box-shadow:0 4px 16px rgba(0,0,0,.08);transition:transform .35s var(--ease)}
+  .card:hover .round{transform:rotate(45deg)}
+
+  footer{border-top:1px solid var(--hair);padding:30px 0 50px;display:flex;justify-content:space-between;align-items:center;color:var(--soft);font-size:13px;flex-wrap:wrap;gap:12px}
+  footer .big{font-family:"Bricolage Grotesque","Inter",sans-serif;font-weight:700;font-size:15px;color:var(--ink)}
+
+  @media (max-width:760px){
+    .menu{display:none}
+    .tabs{grid-template-columns:repeat(2,1fr)}
+    .tab:nth-child(3){border-left:none}
+    .tab:nth-child(odd){border-left:none}
+    .card{aspect-ratio:4/5}
+    .info{width:78%}
+    .wordmark{bottom:auto;top:46px;right:18px;font-size:34px}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand">Frih <span class="mk">✳</span></div>
+    <div class="menu"><a href="#">Shop</a><a href="#">About</a><a href="#">Journal</a><a href="#">Contact</a></div>
+    <a href="#" class="start">Get a Pair</a>
+  </nav>
+
+  <header class="hero">
+    <h1>Made to <em>Move</em><br>with you</h1>
+    <p>Wide-leg palazzo, cut for real days. Every pair Frih makes is free — claim what moves you.</p>
+  </header>
+
+  <div class="tabs" id="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-cat="all">All</button>
+    <button class="tab" role="tab" aria-selected="false" data-cat="palazzo">Palazzo</button>
+    <button class="tab" role="tab" aria-selected="false" data-cat="jorts">Jorts</button>
+    <button class="tab" role="tab" aria-selected="false" data-cat="new">New In</button>
+  </div>
+
+  <main class="grid" id="grid"></main>
+</div>
+
+<div class="wrap">
+  <footer>
+    <span class="big">Frih</span>
+    <span>Made to move with you — always free.</span>
+    <span>© 2025</span>
+  </footer>
+</div>
+
+<script>
+/* Each pant = one card. `file` is the original upload name; `img` is filled
+   with a base64/URL the moment the real photo is available, and it renders. */
+const PANTS = [
+  {name:"Cobalt",  cat:["palazzo"],      file:"Blue_Boogie3erfdas.png",  hex:"#2f5fd6", desc:"High-rise palazzo in a clean cobalt drape. Pressed crease, floor-skimming wide leg.", tags:["Wide-leg","Pleated","Free"]},
+  {name:"Crimson", cat:["palazzo"],      file:"Red_Boogie3erfdas.png",   hex:"#ee2d1f", desc:"The signature wide-leg in vivid crimson. Tailored waistband, fluid fall.", tags:["Wide-leg","Tailored","Free"]},
+  {name:"Forest",  cat:["palazzo"],      file:"Green_Boogie3erfdas.png", hex:"#2e9e3f", desc:"Deep forest palazzo with an architectural sweep. Sharp pleats, soft hand.", tags:["Wide-leg","Pleated","Free"]},
+  {name:"Rose",    cat:["palazzo"],      file:"Pink_Boogie3erfdas.png",  hex:"#e89bb8", desc:"Soft rose palazzo, made to move. Full leg, pressed seams, quiet shine.", tags:["Wide-leg","Soft","Free"]},
+  {name:"Rust",    cat:["palazzo"],      file:"Brown_Boogie3erfdas.png", hex:"#9e4521", desc:"Warm rust wide-leg with a heavier drape. Built for cooler light.", tags:["Wide-leg","Heavy drape","Free"]},
+  {name:"Ink",     cat:["palazzo"],      file:"Black_Boogie3erfdas.png", hex:"#2a2a2a", desc:"The all-day black palazzo. Clean line, no compromise, total ease.", tags:["Wide-leg","Everyday","Free"]},
+  {name:"Sky",     cat:["jorts","new"],  file:"Sky_Jort.png",            hex:"#a8c5dd", desc:"Palazzo, cropped. Pleated sky-blue jort with a knee-length wide leg.", tags:["Cropped","Pleated","New"]},
+  {name:"Blush",   cat:["jorts","new"],  file:"Pink_Jort.png",           hex:"#e89bb8", desc:"The jort in blush. Same architectural width, summer-weight cotton.", tags:["Cropped","Summer","New"]},
+  {name:"Bone",    cat:["jorts","new"],  file:"Bone_Jort.png",           hex:"#ece3ce", desc:"Bone jort with a buttoned waist and deep pleat. Neutral, sharp, light.", tags:["Cropped","Neutral","New"]},
+  {name:"Maize",   cat:["jorts","new"],  file:"Yellow_Jort.png",         hex:"#e6c75e", desc:"Maize jort, pressed and pleated. Wide through the leg, cropped at the knee.", tags:["Cropped","Pleated","New"]},
+];
+
+/* When photos are embedded, add entries here: IMAGES["Blue_Boogie3erfdas.png"]="data:image/png;base64,..." */
+const IMAGES = {};
+
+const grid=document.getElementById("grid");
+function photoHTML(p){
+  const src = IMAGES[p.file];
+  if(src) return `<div class="photo"><img src="${src}" alt="${p.name} palazzo"></div>`;
+  return `<div class="photo"><div class="ph">
+      <div class="sw" style="background:${p.hex}1f;border-color:${p.hex}66"></div>
+      <div class="nm">${p.name}</div>
+      <div class="hint">photo slot ready</div>
+    </div></div>`;
+}
+function cardHTML(p,i){
+  const cat = p.cat.includes("jorts") ? "Jort" : "Palazzo";
+  const num = String(i+1).padStart(2,"0");
+  return `<article class="card" data-cat="${p.cat.join(' ')}">
+    ${photoHTML(p)}
+    <div class="corner-tl">${cat} / ${num}</div>
+    <div class="corner-tr">FRIH <span class="s">✳</span></div>
+    <div class="wordmark">${p.name}</div>
+    <div class="info">
+      <div class="yr"><span class="d"></span> 2025</div>
+      <div class="desc">${p.desc}</div>
+      <div class="tags">${p.tags.map(t=>`<span>${t}</span>`).join("")}</div>
+      <a href="#" class="get">Get This <span>→</span></a>
+    </div>
+    <div class="round">↗</div>
+  </article>`;
+}
+grid.innerHTML = PANTS.map(cardHTML).join("");
+
+/* filtering */
+const tabs=document.getElementById("tabs");
+tabs.addEventListener("click",e=>{
+  const t=e.target.closest(".tab"); if(!t) return;
+  [...tabs.children].forEach(b=>b.setAttribute("aria-selected", b===t?"true":"false"));
+  const cat=t.dataset.cat;
+  document.querySelectorAll(".card").forEach(c=>{
+    const show = cat==="all" || c.dataset.cat.split(" ").includes(cat);
+    if(show){
+      c.classList.remove("hide");
+      c.classList.add("enter");
+      requestAnimationFrame(()=>requestAnimationFrame(()=>c.classList.remove("enter")));
+    }else{
+      c.classList.add("hide");
+    }
+  });
+});
+</script>
+</body>
+</html>
