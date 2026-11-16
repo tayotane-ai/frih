@@ -292,7 +292,7 @@
   const TT_HANDLE = "frih.shop";
   const IG_BEHOLD_FEED_ID = "";           // optional: free Behold.so feed ID → shows your latest Instagram posts automatically
   const IG_POST_URL = "https://www.instagram.com/p/DfW2B6ONLhi/";                 // paste the Instagram post link to feature, e.g. https://www.instagram.com/p/XXXX/
-  const TT_VIDEO_URL = "";                // paste the TikTok video link to feature, e.g. https://www.tiktok.com/@frih.shop/video/123…
+  const TT_VIDEO_URL = "https://www.tiktok.com/@frih.shop/video/7708522170510511382";                // paste the TikTok video link to feature, e.g. https://www.tiktok.com/@frih.shop/video/123…
 
   const $ = s => document.querySelector(s);
   const modal = $("#modal"), panel = $("#panel"), form = $("#wlForm"), err = $("#err");
@@ -326,7 +326,7 @@
     const vid = (TT_VIDEO_URL.match(/video\/(\d+)/) || [])[1];
     if (vid) {
       // TikTok's current Embed Player (the older blockquote embed is being retired)
-      $("#ttEmbed").innerHTML = '<iframe class="tt-player" src="https://www.tiktok.com/player/v1/' + vid + '?rel=0&description=1&music_info=0" allow="fullscreen; encrypted-media; picture-in-picture" allowfullscreen title="Frih on TikTok"></iframe>';
+      $("#ttEmbed").innerHTML = '<iframe class="tt-player" src="https://www.tiktok.com/player/v1/' + vid + '?embed_from=webapp_share&music_info=1&description=1&autoplay=1&muted=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share" allowfullscreen title="Frih on TikTok"></iframe>';
     }
     // Instagram: latest posts via Behold, or one chosen post via Instagram's own embed
     if (IG_BEHOLD_FEED_ID) { $("#igEmbed").innerHTML = '<behold-widget feed-id="' + IG_BEHOLD_FEED_ID + '"></behold-widget>'; addScript("https://w.behold.so/widget.js", true); }
