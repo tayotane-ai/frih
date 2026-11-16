@@ -194,6 +194,7 @@
   .feed-embed blockquote,.feed-embed iframe{margin:0!important;max-width:100%!important;min-width:0!important;width:100%!important}
   .ig-card{display:flex;flex-direction:column;align-items:center;gap:10px;color:rgba(246,244,240,.7);width:100%;padding:34px 20px}
   .ig-card b{color:#fff;font-size:17px;font-weight:600}
+  .feed-embed .tt-player{display:block;width:100%;aspect-ratio:9/16;max-height:72vh;border:0;background:#000}
   .feed-embed blockquote{border:0;padding:0;background:none}
   .feed-ph{color:rgba(246,244,240,.45);font-size:13px;padding:24px;text-align:center}
   .feed-btn{display:block;text-align:center;padding:14px;border-radius:999px;background:var(--white);color:var(--ink);font-weight:600;font-size:14px}
@@ -324,8 +325,8 @@
     // TikTok: one featured video (if a link is set); otherwise the card stays a clean follow card
     const vid = (TT_VIDEO_URL.match(/video\/(\d+)/) || [])[1];
     if (vid) {
-      $("#ttEmbed").innerHTML = '<blockquote class="tiktok-embed" cite="' + TT_VIDEO_URL + '" data-video-id="' + vid + '" style="max-width:605px;min-width:288px;"><section class="feed-ph">Latest from @' + TT_HANDLE + '</section></blockquote>';
-      addScript("https://www.tiktok.com/embed.js");
+      // TikTok's current Embed Player (the older blockquote embed is being retired)
+      $("#ttEmbed").innerHTML = '<iframe class="tt-player" src="https://www.tiktok.com/player/v1/' + vid + '?rel=0&description=1&music_info=0" allow="fullscreen; encrypted-media; picture-in-picture" allowfullscreen title="Frih on TikTok"></iframe>';
     }
     // Instagram: latest posts via Behold, or one chosen post via Instagram's own embed
     if (IG_BEHOLD_FEED_ID) { $("#igEmbed").innerHTML = '<behold-widget feed-id="' + IG_BEHOLD_FEED_ID + '"></behold-widget>'; addScript("https://w.behold.so/widget.js", true); }
