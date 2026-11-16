@@ -312,9 +312,8 @@
 
 
 <script>
-  /* Where sign-ups go: paste your Klaviyo / Mailchimp / Formspree form URL here.
-     While it's empty, a sign-up opens WhatsApp with the person's details so nothing is lost. */
-  const FORM_ENDPOINT = "";
+  /* Where sign-ups go: the Google Apps Script web-app URL that writes each sign-up as a row in the Frih sheet */
+  const SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbyui85PeV-gMSSl7Vk-8Tht7-QX8517zwiXjzVa8z7jJBH4MjgJ2o9Upw87OF8bTdF_/exec";
   const WA = "2349164162270";
 
   /* Socials shown after sign-up */
@@ -403,16 +402,14 @@
     if (!form.elements.consent.checked) return bad(form.elements.consent, "Tick the box so we can keep you posted.");
     const btn = form.querySelector(".submit"); btn.disabled = true; btn.textContent = "One sec…";
     try {
-      if (FORM_ENDPOINT) {
-        const r = await fetch(FORM_ENDPOINT, { method: "POST", headers: { "Accept": "application/json" }, body: new FormData(form) });
-        if (!r.ok) throw 0;
-      }
-      panel.classList.add("sent");            /* show "You're on the list" straight away */
+      // Send to the Google Sheet (Apps Script web app). "no-cors" because Google redirects; the row is still saved.
+      const body = new URLSearchParams({
+        name: d.name.trim(), email: d.email.trim(), phone: (d.phone || "").trim(),
+        consent: "yes", source: location.hostname, page: location.href, ua: navigator.userAgent
+      });
+      if (SHEET_ENDPOINT) await fetch(SHEET_ENDPOINT, { method: "POST", mode: "no-cors", body });
+      panel.classList.add("sent");            /* show "You're on the list" */
       modal.scrollTop = 0; confetti(); loadEmbeds();
-      if (!FORM_ENDPOINT) {                    /* no email tool yet: pass the details to Frih's WhatsApp */
-        const t = "New first-access sign-up 🖤\nName: " + d.name + "\nEmail: " + d.email + (d.phone ? "\nPhone: " + d.phone : "");
-        try { const a = document.createElement("a"); a.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(t); a.target = "_blank"; a.rel = "noopener"; a.click(); } catch (_) {}
-      }
     } catch (_) {
       err.textContent = "Something went wrong. Please try again.";
     } finally { btn.disabled = false; btn.textContent = "Sign me up"; }
