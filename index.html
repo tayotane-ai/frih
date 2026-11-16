@@ -195,6 +195,18 @@
   .ig-card{display:flex;flex-direction:column;align-items:center;gap:10px;color:rgba(246,244,240,.7);width:100%;padding:34px 20px}
   .ig-card b{color:#fff;font-size:17px;font-weight:600}
   .feed-embed .tt-player{display:block;width:100%;aspect-ratio:9/16;max-height:72vh;border:0;background:#000}
+  .tt-card{position:relative;display:block;width:100%;aspect-ratio:9/16;max-height:72vh;border-radius:14px;overflow:hidden;color:#fff;
+           background:radial-gradient(120% 80% at 30% 20%,#3a2a2a 0%,#141212 60%,#0b0b0c 100%)}
+  .tt-cover{position:absolute;inset:0;background:center/cover no-repeat;transition:transform .6s var(--ease)}
+  .tt-card:hover .tt-cover{transform:scale(1.04)}
+  .tt-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,.75) 100%)}
+  .tt-play{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;
+           background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.35);
+           display:flex;align-items:center;justify-content:center;padding-left:4px}
+  .tt-meta{position:absolute;left:16px;right:16px;bottom:16px;display:flex;flex-direction:column;gap:6px;text-align:left}
+  .tt-meta b{font-size:15px}
+  .tt-cap{font-size:13.5px;line-height:1.4;color:rgba(255,255,255,.88);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .tt-cta{font-size:13px;font-weight:600;margin-top:4px}
   .feed-embed blockquote{border:0;padding:0;background:none}
   .feed-ph{color:rgba(246,244,240,.45);font-size:13px;padding:24px;text-align:center}
   .feed-btn{display:block;text-align:center;padding:14px;border-radius:999px;background:var(--white);color:var(--ink);font-weight:600;font-size:14px}
@@ -292,7 +304,8 @@
   const TT_HANDLE = "frih.shop";
   const IG_BEHOLD_FEED_ID = "";           // optional: free Behold.so feed ID → shows your latest Instagram posts automatically
   const IG_POST_URL = "https://www.instagram.com/p/DfW2B6ONLhi/";                 // paste the Instagram post link to feature, e.g. https://www.instagram.com/p/XXXX/
-  const TT_VIDEO_URL = "https://www.tiktok.com/@frih.shop/video/7708522170510511382";                // paste the TikTok video link to feature, e.g. https://www.tiktok.com/@frih.shop/video/123…
+  const TT_VIDEO_URL = "https://www.tiktok.com/@frih.shop/video/7708522170510511382";
+  const TT_CAPTION = "I really enjoyed this one tbfff 🙂‍↕️❤️ Friends went home before I locked up btww.";                // paste the TikTok video link to feature, e.g. https://www.tiktok.com/@frih.shop/video/123…
 
   const $ = s => document.querySelector(s);
   const modal = $("#modal"), panel = $("#panel"), form = $("#wlForm"), err = $("#err");
@@ -325,8 +338,20 @@
     // TikTok: one featured video (if a link is set); otherwise the card stays a clean follow card
     const vid = (TT_VIDEO_URL.match(/video\/(\d+)/) || [])[1];
     if (vid) {
-      // TikTok's current Embed Player (the older blockquote embed is being retired)
-      $("#ttEmbed").innerHTML = '<iframe class="tt-player" src="https://www.tiktok.com/player/v1/' + vid + '?embed_from=webapp_share&music_info=1&description=1&autoplay=1&muted=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share" allowfullscreen title="Frih on TikTok"></iframe>';
+      // TikTok won't play this account's videos outside the app, so we show a post card that opens it on TikTok.
+      // The cover image and caption come from TikTok's public oEmbed info when available.
+      const card = $("#ttEmbed");
+      card.innerHTML = '<a class="tt-card" href="' + TT_VIDEO_URL + '" target="_blank" rel="noopener" aria-label="Watch on TikTok">'
+        + '<span class="tt-cover"></span><span class="tt-shade"></span>'
+        + '<span class="tt-play"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>'
+        + '<span class="tt-meta"><b>@' + TT_HANDLE + '</b><span class="tt-cap">' + TT_CAPTION + '</span><span class="tt-cta">Watch on TikTok →</span></span></a>';
+      fetch("https://www.tiktok.com/oembed?url=" + encodeURIComponent(TT_VIDEO_URL))
+        .then(r => r.ok ? r.json() : null)
+        .then(j => {
+          if (!j) return;
+          if (j.thumbnail_url) card.querySelector(".tt-cover").style.backgroundImage = "url('" + j.thumbnail_url + "')";
+          if (j.title) card.querySelector(".tt-cap").textContent = j.title;
+        }).catch(() => {});
     }
     // Instagram: latest posts via Behold, or one chosen post via Instagram's own embed
     if (IG_BEHOLD_FEED_ID) { $("#igEmbed").innerHTML = '<behold-widget feed-id="' + IG_BEHOLD_FEED_ID + '"></behold-widget>'; addScript("https://w.behold.so/widget.js", true); }
