@@ -195,12 +195,12 @@
   .ig-card{display:flex;flex-direction:column;align-items:center;gap:10px;color:rgba(246,244,240,.7);width:100%;padding:34px 20px}
   .ig-card b{color:#fff;font-size:17px;font-weight:600}
   .feed-embed .tt-player{display:block;width:100%;aspect-ratio:9/16;max-height:72vh;border:0;background:#000}
-  .tt-card{position:relative;display:block;width:100%;aspect-ratio:9/16;max-height:72vh;border-radius:14px;overflow:hidden;color:#fff;
+  .tt-card{position:relative;display:block;width:100%;aspect-ratio:9/16;max-height:66vh;border-radius:14px;overflow:hidden;color:#fff;
            background:radial-gradient(120% 80% at 30% 20%,#3a2a2a 0%,#141212 60%,#0b0b0c 100%)}
   .tt-cover{position:absolute;inset:0;background:center/cover no-repeat;transition:transform .6s var(--ease)}
   .tt-card:hover .tt-cover{transform:scale(1.04)}
   .tt-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,0) 40%,rgba(0,0,0,.75) 100%)}
-  .tt-play{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;
+  .tt-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;
            background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.35);
            display:flex;align-items:center;justify-content:center;padding-left:4px}
   .tt-meta{position:absolute;left:16px;right:16px;bottom:16px;display:flex;flex-direction:column;gap:6px;text-align:left}
@@ -332,30 +332,22 @@
   document.querySelectorAll("[data-tt-link]").forEach(e => e.href = "https://www.tiktok.com/@" + TT_HANDLE);
 
   const addScript = (src, mod) => { const sc = document.createElement("script"); sc.src = src; sc.async = true; if (mod) sc.type = "module"; document.body.appendChild(sc); };
+  /* Featured posts: our own matching cards (cover image saved in /img), tapping opens the post */
+  const POSTS = {
+    ig: { url: IG_POST_URL, img: "img/instagram-post.jpg", handle: IG_HANDLE, cta: "View on Instagram →",
+          caption: "Long long day… Decided to book an Uber from the train station coming back cause I couldn't be bothered 🫠" },
+    tt: { url: TT_VIDEO_URL, img: "img/tiktok-post.jpg", handle: TT_HANDLE, cta: "Watch on TikTok →", caption: TT_CAPTION }
+  };
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const postCard = p => '<a class="tt-card" href="' + esc(p.url) + '" target="_blank" rel="noopener" aria-label="' + esc(p.cta) + '">'
+    + '<span class="tt-cover" style="background-image:url(\'' + p.img + '\')"></span><span class="tt-shade"></span>'
+    + '<span class="tt-play"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>'
+    + '<span class="tt-meta"><b>@' + esc(p.handle) + '</b><span class="tt-cap">' + esc(p.caption) + '</span><span class="tt-cta">' + esc(p.cta) + '</span></span></a>';
   let embedsLoaded = false;
   function loadEmbeds() {
     if (embedsLoaded) return; embedsLoaded = true;
-    // TikTok: one featured video (if a link is set); otherwise the card stays a clean follow card
-    const vid = (TT_VIDEO_URL.match(/video\/(\d+)/) || [])[1];
-    if (vid) {
-      // TikTok won't play this account's videos outside the app, so we show a post card that opens it on TikTok.
-      // The cover image and caption come from TikTok's public oEmbed info when available.
-      const card = $("#ttEmbed");
-      card.innerHTML = '<a class="tt-card" href="' + TT_VIDEO_URL + '" target="_blank" rel="noopener" aria-label="Watch on TikTok">'
-        + '<span class="tt-cover"></span><span class="tt-shade"></span>'
-        + '<span class="tt-play"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span>'
-        + '<span class="tt-meta"><b>@' + TT_HANDLE + '</b><span class="tt-cap">' + TT_CAPTION + '</span><span class="tt-cta">Watch on TikTok →</span></span></a>';
-      fetch("https://www.tiktok.com/oembed?url=" + encodeURIComponent(TT_VIDEO_URL))
-        .then(r => r.ok ? r.json() : null)
-        .then(j => {
-          if (!j) return;
-          if (j.thumbnail_url) card.querySelector(".tt-cover").style.backgroundImage = "url('" + j.thumbnail_url + "')";
-          if (j.title) card.querySelector(".tt-cap").textContent = j.title;
-        }).catch(() => {});
-    }
-    // Instagram: latest posts via Behold, or one chosen post via Instagram's own embed
-    if (IG_BEHOLD_FEED_ID) { $("#igEmbed").innerHTML = '<behold-widget feed-id="' + IG_BEHOLD_FEED_ID + '"></behold-widget>'; addScript("https://w.behold.so/widget.js", true); }
-    else if (IG_POST_URL) { $("#igEmbed").innerHTML = '<blockquote class="instagram-media" data-instgrm-permalink="' + IG_POST_URL + '" data-instgrm-version="14" style="background:#fff;border:0;border-radius:12px;margin:0;width:100%"><a href="' + IG_POST_URL + '" target="_blank" rel="noopener" class="feed-ph" style="display:block;color:#555">Latest from @' + IG_HANDLE + '</a></blockquote>'; addScript("https://www.instagram.com/embed.js"); }
+    if (POSTS.ig.url) $("#igEmbed").innerHTML = postCard(POSTS.ig);
+    if (POSTS.tt.url) $("#ttEmbed").innerHTML = postCard(POSTS.tt);
   }
 
   /* Confetti in Frih colours */
